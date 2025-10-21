@@ -1,0 +1,45 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio / VS Code files
+.vs/
+.vscode/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# NuGet packages
+*.nupkg
+packages/
+# Uncomment if you have package restore turned on
+# !packages/build/
+
+# Build output from VS, dotnet build, etc.
+Debug/
+Release/
+
+# Publish output
+*.publishsettings
+project.lock.json
+
+# Resharper, Rider, JetBrains
+.idea/
+*.DotSettings.user
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Secrets (never commit sensitive credentials)
+appsettings.Development.json
