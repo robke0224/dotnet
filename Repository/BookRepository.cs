@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Collections.Generic;
 using dotnet.Data;
 using dotnet.Interfaces;
 using dotnet.Models;
@@ -14,7 +16,7 @@ namespace dotnet.Repository
 
         public bool BookExists(int bookId)
         {
-            throw new NotImplementedException();
+           return _context.Books.Any(b => b.Id == bookId);
         }
 
         public Book GetBook(int bookId)
