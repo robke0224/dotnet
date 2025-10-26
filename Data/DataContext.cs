@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using dotnet.Models;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace dotnet.Data
 {

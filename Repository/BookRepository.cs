@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Collections.Generic;
 using dotnet.Data;
 using dotnet.Interfaces;
 using dotnet.Models;
