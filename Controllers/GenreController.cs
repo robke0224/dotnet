@@ -5,47 +5,48 @@ using dotnet.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet.Controllers
-
-[Route("api/[controller]")]
-[ApiController]
-
-public class GenreController : ControllerBase
 {
-    private readonly IGenreRepository _genreRepository;
-    private readonly IMapper _mapper;
-
-    public GenreController(IGenreRepository genreRepository, IMapper mapper)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class GenreController : ControllerBase
     {
-        _genreRepository = genreRepository;
-        _mapper = mapper;
-    }
+        private readonly IGenreRepository _genreRepository;
+        private readonly IMapper _mapper;
 
-    [HttpGet]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<Genre>))]
-    public IActionResult GetGenres()
-    {
-        var genres = _mapper.Map<List<GenreBTO>>(_genreRepository.GetGenres());
+        public GenreController(IGenreRepository genreRepository, IMapper mapper)
+        {
+            _genreRepository = genreRepository;
+            _mapper = mapper;
+        }
 
-        if (!ModelState.IsValid)
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Genre>))]
+        public IActionResult GetGenres()
         {
-            return BadRequest(ModelState);
-        }
-        return Ok(genres);
-    }
+            var genres = _mapper.Map<List<GenreDTO>>(_genreRepository.GetGenres());
 
-    [HttpGet("{genreId}")]
-    [ProducesResponseType(200, Type = typeof(Genre))]
-    [ProducesResponseType(404)]
-    public IActionResult GetGenre(int genreId)
-    {
-        if (!_genreRepository.GenreExists(genreId))
-        {
-            return NotFound();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(genres);
         }
-        var genre = _mapper.Map<GenreDTO>(_genreRepository.GetGenre(genreId));
-        if (!ModelState.IsValid)
+
+        [HttpGet("{genreId}")]
+        [ProducesResponseType(200, Type = typeof(Genre))]
+        [ProducesResponseType(404)]
+        public IActionResult GetGenre(int genreId)
         {
-            return BadRequest(ModelState);
+            if (!_genreRepository.GenreExists(genreId))
+            {
+                return NotFound();
+            }
+            var genre = _mapper.Map<GenreDTO>(_genreRepository.GetGenre(genreId));
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(genre);
         }
-        return Ok(genre);
     }
+}

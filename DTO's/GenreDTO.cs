@@ -1,8 +1,8 @@
 namespace dotnet.DTOs
 {
-    public class GenreBTO
+    public class GenreDTO
     {
         public int Id { get; set; }
         public required string GenreName { get; set; }
     }
-}
+} 
