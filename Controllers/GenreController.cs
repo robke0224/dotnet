@@ -48,5 +48,24 @@ namespace dotnet.Controllers
             }
             return Ok(genre);
         }
+
+
+        [HttpGet("books/{genreId}")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Book>))]
+        [ProducesResponseType(404)]
+        public IActionResult GetBooksByGenre(int genreId)
+        {
+            if (!_genreRepository.GenreExists(genreId))
+            {
+                return NotFound();
+            }
+
+            var books = _mapper.Map<List<BookDTO>>(_genreRepository.GetBooksByGenre(genreId));
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(books);
+        }
     }
 }

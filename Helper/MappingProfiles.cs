@@ -8,7 +8,8 @@ namespace dotnet.Helper
     {
         public MappingProfiles()
         {
-            CreateMap<Book, BookDTO>(); 
+            CreateMap<Book, BookDTO>();
+            CreateMap<Genre, GenreDTO>();
         }
     }
 }
