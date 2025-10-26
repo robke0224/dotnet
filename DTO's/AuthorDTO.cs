@@ -1,12 +1,9 @@
-namespace dotnet.Models
+namespace dotnet.DTOs  
 {
-    public class Author
+    public class AuthorDTO
     {
         public int Id { get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-
-        public required ICollection<BookAuthor> BookAuthors { get; set; }
-
     }
 }

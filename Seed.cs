@@ -48,7 +48,8 @@ namespace dotnet
                         Author = new Author()
                         {
                             FirstName = "Jack",
-                            LastName = "London"
+                            LastName = "London",
+                            BookAuthors = new List<BookAuthor>()
                         }
                     },
                     new BookAuthor()
@@ -63,7 +64,7 @@ namespace dotnet
                             },
                             BookAuthors = new List<BookAuthor>()
                             {
-                                new BookAuthor { Author = new Author() { FirstName = "John", LastName = "Doe"}}
+                                new BookAuthor { Author = new Author() { FirstName = "John", LastName = "Doe", BookAuthors = new List<BookAuthor>()}}
                             },
                             Reviews = new List<Review>()
                             {
@@ -87,7 +88,7 @@ namespace dotnet
                         {
                             FirstName = "Harry",
                             LastName = "Potter",
-                            
+                            BookAuthors = new List<BookAuthor>()
                         }
                     },
                         new BookAuthor()
@@ -117,6 +118,7 @@ namespace dotnet
                         {
                             FirstName = "Ash",
                             LastName = "Ketchum",
+                            BookAuthors = new List<BookAuthor>()
                         }
                     }
                 };
