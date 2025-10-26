@@ -1,19 +1,19 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using dotnet;
-using dotnet.Data;
 using dotnet.Interfaces;
 using dotnet.Repository;
+using dotnet.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<dotnet.Seed>();
+builder.Services.AddTransient<Seed>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddDbContext<dotnet.Data.DataContext>(options =>
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
