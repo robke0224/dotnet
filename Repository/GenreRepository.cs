@@ -39,6 +39,16 @@ namespace dotnet.Repository
                    .ToList();
 }
 
-        
+        public bool CreateGenre(Genre genre)
+        { 
+            _context.Add(genre);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
     }
 }

@@ -67,5 +67,39 @@ namespace dotnet.Controllers
             }
             return Ok(books);
         }
+
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateGenre([FromBody] GenreDTO genreCreate)
+        {
+            if (genreCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+            var genre = _genreRepository.GetGenres()
+                .Where(g => g.GenreName.Trim().ToUpper() == genreCreate.GenreName.TrimEnd().ToUpper())
+                .FirstOrDefault();
+            if (genre != null)
+            {
+                ModelState.AddModelError("", "Gendre already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var genreMap = _mapper.Map<Genre>(genreCreate);
+            if (!_genreRepository.CreateGenre(genreMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created!");
+        }
     }
 }
