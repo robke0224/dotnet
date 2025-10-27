@@ -39,5 +39,17 @@ namespace dotnet.Repository
         {
             return _context.Authors.Any(a => a.Id == authorId);
         }
+
+        public bool CreateAuthor(Author author)
+        {
+            _context.Add(author);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
     }
 }

@@ -11,5 +11,7 @@ namespace dotnet.Interfaces
         
         ICollection<Book> GetBooksByAuthor(int authorId);
         bool AuthorExists(int authorId);
+        bool CreateAuthor(Author author);
+        bool Save();
     }
 }

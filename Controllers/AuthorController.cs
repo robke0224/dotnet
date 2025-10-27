@@ -60,12 +60,45 @@ namespace dotnet.Controllers
             }
             var books = _mapper.Map<List<BookDTO>>(
                 _authorRepository.GetBooksByAuthor(authorId));
-                
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             return Ok(books);
         }
-    }
+    
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateAuthor([FromBody] AuthorDTO authorCreate)
+        {
+            if (authorCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+            var author = _authorRepository.GetAuthors()
+                .Where(g => g.FirstName.Trim().ToUpper() == authorCreate.FirstName.TrimEnd().ToUpper())
+                .FirstOrDefault();
+            if (author != null)
+            {
+                ModelState.AddModelError("", "Author already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var authorMap = _mapper.Map<Author>(authorCreate);
+            if (!_authorRepository.CreateAuthor(authorMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created!");
+        }
+          
+        }
 }
