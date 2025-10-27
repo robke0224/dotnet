@@ -12,6 +12,7 @@ namespace dotnet.Helper
             CreateMap<Genre, GenreDTO>();
             CreateMap<Author, AuthorDTO>();
             CreateMap<Review, ReviewDTO>();
+            CreateMap<Reviewer, ReviewerDTO>();
         }
     }
 }
