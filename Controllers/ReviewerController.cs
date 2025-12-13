@@ -68,7 +68,7 @@ namespace dotnet.Controllers
             return Ok(reviews);
         }
 
-        // ✅ POST api/reviewer
+        
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -85,7 +85,6 @@ namespace dotnet.Controllers
             var first = reviewerCreate.FirstName.Trim();
             var last = reviewerCreate.LastName.Trim();
 
-            // dublikato check (FirstName + LastName)
             var exists = _reviewerRepository.GetReviewers()
                 .Any(r =>
                     r.FirstName.Trim().ToUpper() == first.ToUpper() &&
@@ -99,7 +98,7 @@ namespace dotnet.Controllers
 
             var reviewerMap = _mapper.Map<Reviewer>(reviewerCreate);
 
-            // kad nebūtų null kolekcija
+            
             reviewerMap.Reviews ??= new List<Review>();
 
             if (!_reviewerRepository.CreateReviewer(reviewerMap))

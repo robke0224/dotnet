@@ -9,11 +9,7 @@ namespace dotnet.Helper
     {
         public MappingProfiles()
         {
-            // =========================
-            // BOOK
-            // =========================
-
-            // Book -> BookDTO (GET)
+            
             CreateMap<Book, BookDTO>()
                 .ForMember(d => d.AuthorFirstName, o => o.MapFrom(s =>
                     s.BookAuthors != null && s.BookAuthors.Any()
@@ -28,46 +24,34 @@ namespace dotnet.Helper
                         ? (s.BookGenres.Select(bg => bg.Genre.GenreName).FirstOrDefault() ?? string.Empty)
                         : string.Empty));
 
-            // BookDTO -> Book (POST/PUT)
+            
             CreateMap<BookDTO, Book>()
                 .ForMember(d => d.Reviews, o => o.Ignore())
                 .ForMember(d => d.BookAuthors, o => o.Ignore())
                 .ForMember(d => d.BookGenres, o => o.Ignore());
 
-            // =========================
-            // GENRE
-            // =========================
+            
             CreateMap<Genre, GenreDTO>();
             CreateMap<GenreDTO, Genre>();
 
-            // =========================
-            // AUTHOR
-            // =========================
+           
             CreateMap<Author, AuthorDTO>();
             CreateMap<AuthorDTO, Author>()
-                .ForMember(d => d.BookAuthors, o => o.Ignore()); // nes Author turi required ICollection<BookAuthor>
+                .ForMember(d => d.BookAuthors, o => o.Ignore()); 
 
-            // =========================
-            // REVIEW
-            // =========================
-
-            // Review -> ReviewDTO (GET)
+            
             CreateMap<Review, ReviewDTO>()
                 .ForMember(d => d.ReviewerFirstName, o => o.MapFrom(s =>
                     s.Reviewer != null ? s.Reviewer.FirstName : string.Empty))
                 .ForMember(d => d.ReviewerLastName, o => o.MapFrom(s =>
                     s.Reviewer != null ? s.Reviewer.LastName : string.Empty));
 
-            // ReviewDTO -> Review (POST)
-            // BookTitle + ReviewText map'insis automatiškai (sutampa pavadinimai)
+            
             CreateMap<ReviewDTO, Review>()
                 .ForMember(d => d.Reviewer, o => o.Ignore())
                 .ForMember(d => d.Book, o => o.Ignore());
 
-            // =========================
-            // REVIEWER
-            // =========================
-            // Reviewer <-> ReviewerDTO
+            
 CreateMap<Reviewer, ReviewerDTO>()
     .ForMember(d => d.Reviews, o => o.MapFrom(s => s.Reviews));
 

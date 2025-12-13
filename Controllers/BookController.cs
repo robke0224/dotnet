@@ -138,7 +138,7 @@ namespace dotnet.Controllers
             return Ok("Successfully created!");
         }
 
-        // ✅ UPDATE BOOK (full update)
+        
         [HttpPut("{bookId:int}")]
         [ProducesResponseType(200, Type = typeof(BookDTO))]
         [ProducesResponseType(400)]
@@ -229,7 +229,7 @@ namespace dotnet.Controllers
             return Ok(updated);
         }
 
-        // ✅ PATCH BOOK (partial update)
+     
         [HttpPatch("{bookId:int}")]
         [ProducesResponseType(200, Type = typeof(BookDTO))]
         [ProducesResponseType(400)]
@@ -248,7 +248,7 @@ namespace dotnet.Controllers
             if (existing == null)
                 return NotFound();
 
-            // Dabartiniai author/genre (fallback, jei useris nepateikia)
+            
             var existingAuthor = existing.BookAuthors?.FirstOrDefault()?.Author;
             var existingGenre = existing.BookGenres?.FirstOrDefault()?.Genre;
 
@@ -258,11 +258,11 @@ namespace dotnet.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Naujos reikšmės: jei null -> paliekam senas
+           
             var newTitle = patch.BookTitle != null ? patch.BookTitle.Trim() : existing.BookTitle;
             var newYear = patch.BookPublicationDate.HasValue ? patch.BookPublicationDate.Value : existing.BookPublicationDate;
 
-            // Author: jei keičia, turi pateikti abu laukus
+           
             var author = existingAuthor;
             if (patch.AuthorFirstName != null || patch.AuthorLastName != null)
             {
@@ -297,7 +297,7 @@ namespace dotnet.Controllers
                 }
             }
 
-            // Genre: jei keičia
+            
             var genre = existingGenre;
             if (patch.GenreName != null)
             {
@@ -318,7 +318,7 @@ namespace dotnet.Controllers
                 }
             }
 
-            // Duplicate check (Title + Year)
+            
             var duplicate = _bookRepository.GetBooks()
                 .Any(b => b.Id != bookId &&
                           b.BookTitle.Trim().ToUpper() == newTitle.ToUpper() &&
