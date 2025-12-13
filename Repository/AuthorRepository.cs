@@ -17,22 +17,28 @@ namespace dotnet.Repository
 
         public Author GetAuthor(int authorId)
         {
-            return _context.Authors.Where(a => a.Id == authorId).FirstOrDefault();
+            return _context.Authors.FirstOrDefault(a => a.Id == authorId);
         }
 
-        public ICollection<Author> GetAuthorsOfABook(int bookId)
-        {
-            return _context.BookAuthors.Where(ba => ba.BookId == bookId).Select(ba => ba.Author).ToList();
-        }
-        
         public ICollection<Author> GetAuthors()
         {
             return _context.Authors.ToList();
         }
 
+        public ICollection<Author> GetAuthorsOfABook(int bookId)
+        {
+            return _context.BookAuthors
+                .Where(ba => ba.BookId == bookId)
+                .Select(ba => ba.Author)
+                .ToList();
+        }
+
         public ICollection<Book> GetBooksByAuthor(int authorId)
         {
-            return _context.BookAuthors.Where(ba => ba.AuthorId == authorId).Select(ba => ba.Book).ToList();
+            return _context.BookAuthors
+                .Where(ba => ba.AuthorId == authorId)
+                .Select(ba => ba.Book)
+                .ToList();
         }
 
         public bool AuthorExists(int authorId)
@@ -46,10 +52,22 @@ namespace dotnet.Repository
             return Save();
         }
 
+        public bool UpdateAuthor(Author author)
+        {
+            if (author == null) return false;
+
+            var existing = _context.Authors.FirstOrDefault(a => a.Id == author.Id);
+            if (existing == null) return false;
+
+            existing.FirstName = author.FirstName;
+            existing.LastName = author.LastName;
+
+            return Save();
+        }
+
         public bool Save()
         {
-            var saved = _context.SaveChanges();
-            return saved > 0 ? true : false;
+            return _context.SaveChanges() > 0;
         }
     }
 }
