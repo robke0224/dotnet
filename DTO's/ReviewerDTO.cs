@@ -5,6 +5,7 @@ namespace dotnet.DTOs
         public int Id { get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        public ICollection<ReviewDTO> Reviews { get; set; }
+
+        public ICollection<ReviewDTO> Reviews { get; set; } = new List<ReviewDTO>();
     }
 }

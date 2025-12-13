@@ -41,10 +41,11 @@ namespace dotnet.Repository
 
         public bool CreateGenre(Genre genre)
         { 
+            //change tracker
             _context.Add(genre);
             return Save();
         }
-
+ 
         public bool Save()
         {
             var saved = _context.SaveChanges();

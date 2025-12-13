@@ -9,5 +9,7 @@ namespace dotnet.Interfaces
         Book GetBook(string bookTitle);
         bool BookExists(int bookId, string bookTitle);
         bool BookExists(int bookId);
+        bool CreateBook(int authorId, int genreId, Book book);
+        bool Save();
     }
 }

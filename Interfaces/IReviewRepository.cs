@@ -1,4 +1,4 @@
-namespace dotnet.Interfaces 
+namespace dotnet.Interfaces
 {
     using dotnet.Models;
     using System.Collections.Generic;
@@ -9,5 +9,11 @@ namespace dotnet.Interfaces
         Review GetReview(int reviewId);
         ICollection<Review> GetReviewsByBook(int bookId);
         bool ReviewExists(int reviewId);
+
+        bool CreateReview(Review review);
+
+        bool CreateReview(string reviewerFirstName, string reviewerLastName, Review review);
+
+        bool Save();
     }
 }

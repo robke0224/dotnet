@@ -83,7 +83,7 @@ namespace dotnet.Controllers
                 .FirstOrDefault();
             if (genre != null)
             {
-                ModelState.AddModelError("", "Gendre already exists");
+                ModelState.AddModelError("", "Genre already exists");
                 return StatusCode(422, ModelState);
             }
 
