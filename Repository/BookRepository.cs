@@ -65,27 +65,46 @@ namespace dotnet.Repository
             if (author == null || genre == null || book == null)
                 return false;
 
-            // ensure collections exist (Book has ICollection navs)
             book.BookAuthors ??= new List<BookAuthor>();
             book.BookGenres ??= new List<BookGenre>();
             book.Reviews ??= new List<Review>();
 
             _context.Books.Add(book);
 
-            var bookAuthor = new BookAuthor
-            {
-                Author = author,
-                Book = book
-            };
+            _context.Add(new BookAuthor { Author = author, Book = book });
+            _context.Add(new BookGenre { Genre = genre, Book = book });
 
-            var bookGenre = new BookGenre
-            {
-                Genre = genre,
-                Book = book
-            };
+            return _context.SaveChanges() > 0;
+        }
 
-            _context.Add(bookAuthor);
-            _context.Add(bookGenre);
+        
+        public bool UpdateBook(int bookId, int authorId, int genreId, Book book)
+        {
+            var existing = _context.Books
+                .Include(b => b.BookAuthors)
+                .Include(b => b.BookGenres)
+                .FirstOrDefault(b => b.Id == bookId);
+
+            if (existing == null) return false;
+
+            var author = _context.Authors.FirstOrDefault(a => a.Id == authorId);
+            var genre = _context.Genres.FirstOrDefault(g => g.Id == genreId);
+
+            if (author == null || genre == null || book == null) return false;
+
+            
+            existing.BookTitle = book.BookTitle;
+            existing.BookPublicationDate = book.BookPublicationDate;
+
+            
+            if (existing.BookAuthors != null && existing.BookAuthors.Any())
+                _context.BookAuthors.RemoveRange(existing.BookAuthors);
+
+            if (existing.BookGenres != null && existing.BookGenres.Any())
+                _context.BookGenres.RemoveRange(existing.BookGenres);
+
+            _context.BookAuthors.Add(new BookAuthor { Book = existing, Author = author });
+            _context.BookGenres.Add(new BookGenre { Book = existing, Genre = genre });
 
             return _context.SaveChanges() > 0;
         }
