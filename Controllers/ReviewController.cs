@@ -72,7 +72,7 @@ namespace dotnet.Controllers
             return Ok(reviews);
         }
 
-        // ✅ POST api/review
+        
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -101,7 +101,6 @@ namespace dotnet.Controllers
             return Ok("Successfully created!");
         }
 
-        // ✅ PUT api/review/{reviewId}  (full update)
         [HttpPut("{reviewId:int}")]
         [ProducesResponseType(200, Type = typeof(ReviewDTO))]
         [ProducesResponseType(400)]
@@ -172,7 +171,7 @@ namespace dotnet.Controllers
             return Ok(updated);
         }
 
-        // ✅ PATCH api/review/{reviewId} (partial update)
+        
         [HttpPatch("{reviewId:int}")]
         [ProducesResponseType(200, Type = typeof(ReviewDTO))]
         [ProducesResponseType(400)]
@@ -190,11 +189,11 @@ namespace dotnet.Controllers
             if (existing == null)
                 return NotFound();
 
-            // ReviewText
+            
             if (patch.ReviewText != null)
                 existing.ReviewText = patch.ReviewText.Trim();
 
-            // BookTitle -> perrišam prie kitos knygos
+            
             if (patch.BookTitle != null)
             {
                 var title = patch.BookTitle.Trim();
@@ -209,7 +208,7 @@ namespace dotnet.Controllers
                 existing.Book = book;
             }
 
-            // Reviewer -> jei keičia, turi pateikti abu
+            
             if (patch.ReviewerFirstName != null || patch.ReviewerLastName != null)
             {
                 if (string.IsNullOrWhiteSpace(patch.ReviewerFirstName) || string.IsNullOrWhiteSpace(patch.ReviewerLastName))

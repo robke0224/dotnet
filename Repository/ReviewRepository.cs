@@ -54,7 +54,7 @@ namespace dotnet.Repository
             return Save();
         }
 
-        // ✅ Senas metodas
+    
         public bool CreateReview(Review review)
         {
             if (review == null) return false;
@@ -63,7 +63,7 @@ namespace dotnet.Repository
             return Save();
         }
 
-        // ✅ UPDATE REVIEW (saugus, be tracking konfliktų)
+   
         public bool UpdateReview(Review review)
         {
             if (review == null) return false;
