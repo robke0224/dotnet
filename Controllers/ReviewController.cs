@@ -6,17 +6,26 @@ namespace dotnet.Controllers
     using dotnet.Models;
     using Microsoft.AspNetCore.Mvc;
     using System.Collections.Generic;
+    using System.Linq;
 
     [ApiController]
     [Route("api/[controller]")]
     public class ReviewController : ControllerBase
     {
         private readonly IReviewRepository _reviewRepository;
+        private readonly IBookRepository _bookRepository;
+        private readonly IReviewerRepository _reviewerRepository;
         private readonly IMapper _mapper;
 
-        public ReviewController(IReviewRepository reviewRepository, IMapper mapper)
+        public ReviewController(
+            IReviewRepository reviewRepository,
+            IBookRepository bookRepository,
+            IReviewerRepository reviewerRepository,
+            IMapper mapper)
         {
             _reviewRepository = reviewRepository;
+            _bookRepository = bookRepository;
+            _reviewerRepository = reviewerRepository;
             _mapper = mapper;
         }
 
@@ -76,7 +85,6 @@ namespace dotnet.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // mapinam BookTitle + ReviewText (Reviewer/Book priskirs repo)
             var reviewMap = _mapper.Map<Review>(reviewCreate);
 
             var created = _reviewRepository.CreateReview(
@@ -91,6 +99,163 @@ namespace dotnet.Controllers
             }
 
             return Ok("Successfully created!");
+        }
+
+        // ✅ PUT api/review/{reviewId}  (full update)
+        [HttpPut("{reviewId:int}")]
+        [ProducesResponseType(200, Type = typeof(ReviewDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdateReview(int reviewId, [FromBody] ReviewDTO reviewUpdate)
+        {
+            if (reviewUpdate == null)
+                return BadRequest(ModelState);
+
+            if (reviewId != reviewUpdate.Id)
+            {
+                ModelState.AddModelError("", "Review ID mismatch");
+                return BadRequest(ModelState);
+            }
+
+            if (!_reviewRepository.ReviewExists(reviewId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var title = reviewUpdate.BookTitle.Trim();
+            var book = _bookRepository.GetBook(title);
+            if (book == null)
+            {
+                ModelState.AddModelError("", "Book not found");
+                return NotFound(ModelState);
+            }
+
+            var first = reviewUpdate.ReviewerFirstName.Trim();
+            var last = reviewUpdate.ReviewerLastName.Trim();
+
+            var reviewer = _reviewerRepository.GetReviewers()
+                .FirstOrDefault(r =>
+                    r.FirstName.Trim().ToUpper() == first.ToUpper() &&
+                    r.LastName.Trim().ToUpper() == last.ToUpper());
+
+            if (reviewer == null)
+            {
+                reviewer = new Reviewer
+                {
+                    FirstName = first,
+                    LastName = last,
+                    Reviews = new List<Review>()
+                };
+
+                if (!_reviewerRepository.CreateReviewer(reviewer))
+                {
+                    ModelState.AddModelError("", "Something went wrong while saving reviewer");
+                    return StatusCode(500, ModelState);
+                }
+            }
+
+            var reviewMap = _mapper.Map<Review>(reviewUpdate);
+            reviewMap.Id = reviewId;
+            reviewMap.Book = book;
+            reviewMap.Reviewer = reviewer;
+
+            if (!_reviewRepository.UpdateReview(reviewMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while updating review");
+                return StatusCode(500, ModelState);
+            }
+
+            var updated = _mapper.Map<ReviewDTO>(_reviewRepository.GetReview(reviewId));
+            return Ok(updated);
+        }
+
+        // ✅ PATCH api/review/{reviewId} (partial update)
+        [HttpPatch("{reviewId:int}")]
+        [ProducesResponseType(200, Type = typeof(ReviewDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult PatchReview(int reviewId, [FromBody] ReviewPatchDTO patch)
+        {
+            if (patch == null)
+                return BadRequest(ModelState);
+
+            if (!_reviewRepository.ReviewExists(reviewId))
+                return NotFound();
+
+            var existing = _reviewRepository.GetReview(reviewId);
+            if (existing == null)
+                return NotFound();
+
+            // ReviewText
+            if (patch.ReviewText != null)
+                existing.ReviewText = patch.ReviewText.Trim();
+
+            // BookTitle -> perrišam prie kitos knygos
+            if (patch.BookTitle != null)
+            {
+                var title = patch.BookTitle.Trim();
+                var book = _bookRepository.GetBook(title);
+                if (book == null)
+                {
+                    ModelState.AddModelError("", "Book not found");
+                    return NotFound(ModelState);
+                }
+
+                existing.BookTitle = title;
+                existing.Book = book;
+            }
+
+            // Reviewer -> jei keičia, turi pateikti abu
+            if (patch.ReviewerFirstName != null || patch.ReviewerLastName != null)
+            {
+                if (string.IsNullOrWhiteSpace(patch.ReviewerFirstName) || string.IsNullOrWhiteSpace(patch.ReviewerLastName))
+                {
+                    ModelState.AddModelError("", "To update reviewer, provide both ReviewerFirstName and ReviewerLastName.");
+                    return BadRequest(ModelState);
+                }
+
+                var first = patch.ReviewerFirstName.Trim();
+                var last = patch.ReviewerLastName.Trim();
+
+                var reviewer = _reviewerRepository.GetReviewers()
+                    .FirstOrDefault(r =>
+                        r.FirstName.Trim().ToUpper() == first.ToUpper() &&
+                        r.LastName.Trim().ToUpper() == last.ToUpper());
+
+                if (reviewer == null)
+                {
+                    reviewer = new Reviewer
+                    {
+                        FirstName = first,
+                        LastName = last,
+                        Reviews = new List<Review>()
+                    };
+
+                    if (!_reviewerRepository.CreateReviewer(reviewer))
+                    {
+                        ModelState.AddModelError("", "Something went wrong while saving reviewer");
+                        return StatusCode(500, ModelState);
+                    }
+                }
+
+                existing.Reviewer = reviewer;
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewRepository.UpdateReview(existing))
+            {
+                ModelState.AddModelError("", "Something went wrong while updating review");
+                return StatusCode(500, ModelState);
+            }
+
+            var updated = _mapper.Map<ReviewDTO>(_reviewRepository.GetReview(reviewId));
+            return Ok(updated);
         }
     }
 }

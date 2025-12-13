@@ -13,6 +13,7 @@ namespace dotnet.Interfaces
         bool CreateReview(Review review);
 
         bool CreateReview(string reviewerFirstName, string reviewerLastName, Review review);
+        bool UpdateReview(Review review);
 
         bool Save();
     }

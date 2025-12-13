@@ -19,7 +19,7 @@ namespace dotnet.Repository
             _mapper = mapper;
         }
 
-        // ✅ Naujas overload: user įveda reviewer vardą/pavardę + review (BookTitle + ReviewText)
+        
         public bool CreateReview(string reviewerFirstName, string reviewerLastName, Review review)
         {
             if (review == null) return false;
@@ -28,11 +28,9 @@ namespace dotnet.Repository
             var first = reviewerFirstName.Trim();
             var last = reviewerLastName.Trim();
 
-            // Rasti knygą pagal pavadinimą
             var book = _context.Books.FirstOrDefault(b => b.BookTitle == title);
             if (book == null) return false;
 
-            // Rasti arba sukurti reviewer
             var reviewer = _context.Reviewers.FirstOrDefault(r =>
                 r.FirstName.Trim().ToUpper() == first.ToUpper() &&
                 r.LastName.Trim().ToUpper() == last.ToUpper());
@@ -49,7 +47,6 @@ namespace dotnet.Repository
                 _context.Reviewers.Add(reviewer);
             }
 
-            // Priskirti ryšius
             review.Book = book;
             review.Reviewer = reviewer;
 
@@ -57,13 +54,36 @@ namespace dotnet.Repository
             return Save();
         }
 
-        // ✅ Senas metodas: jei kažkur dar naudoji CreateReview(review)
-        // (Tikrina, ar review turi Book ir Reviewer; jei ne - nepavyks)
+        // ✅ Senas metodas
         public bool CreateReview(Review review)
         {
             if (review == null) return false;
 
             _context.Reviews.Add(review);
+            return Save();
+        }
+
+        // ✅ UPDATE REVIEW (saugus, be tracking konfliktų)
+        public bool UpdateReview(Review review)
+        {
+            if (review == null) return false;
+
+            var existing = _context.Reviews
+                .Include(r => r.Reviewer)
+                .Include(r => r.Book)
+                .FirstOrDefault(r => r.Id == review.Id);
+
+            if (existing == null) return false;
+
+            existing.BookTitle = review.BookTitle;
+            existing.ReviewText = review.ReviewText;
+
+            if (review.Book != null)
+                existing.Book = review.Book;
+
+            if (review.Reviewer != null)
+                existing.Reviewer = review.Reviewer;
+
             return Save();
         }
 
