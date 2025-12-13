@@ -1,4 +1,4 @@
-namespace dotnet.Repository 
+namespace dotnet.Repository
 {
     using dotnet.Data;
     using dotnet.Interfaces;
@@ -28,28 +28,38 @@ namespace dotnet.Repository
 
         public Genre GetGenre(int genreId)
         {
-            return _context.Genres.Where(g => g.Id == genreId).FirstOrDefault();
+            return _context.Genres.FirstOrDefault(g => g.Id == genreId);
         }
 
-       public ICollection<Book> GetBooksByGenre(int genreId)
-{
-    return _context.Books
-                   .Include(b => b.BookGenres)
-                   .Where(b => b.BookGenres != null && b.BookGenres.Any(bg => bg.GenreId == genreId))
-                   .ToList();
-}
+        public ICollection<Book> GetBooksByGenre(int genreId)
+        {
+            return _context.Books
+                .Include(b => b.BookGenres)
+                .Where(b => b.BookGenres != null && b.BookGenres.Any(bg => bg.GenreId == genreId))
+                .ToList();
+        }
 
         public bool CreateGenre(Genre genre)
-        { 
-            //change tracker
+        {
             _context.Add(genre);
             return Save();
         }
- 
+
+       
+        public bool UpdateGenre(Genre genre)
+        {
+            var existing = _context.Genres.FirstOrDefault(g => g.Id == genre.Id);
+            if (existing == null) return false;
+
+            existing.GenreName = genre.GenreName;
+
+            return Save();
+        }
+
+
         public bool Save()
         {
-            var saved = _context.SaveChanges();
-            return saved > 0 ? true : false;
+            return _context.SaveChanges() > 0;
         }
     }
 }

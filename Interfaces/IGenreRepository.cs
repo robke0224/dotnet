@@ -9,6 +9,7 @@ namespace dotnet.Interfaces
         ICollection<Book> GetBooksByGenre(int genreId);
         bool GenreExists(int genreId);
         bool CreateGenre(Genre genre);
+        bool UpdateGenre(Genre genre);
         bool Save();
     }
 }
