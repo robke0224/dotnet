@@ -256,5 +256,33 @@ namespace dotnet.Controllers
             var updated = _mapper.Map<ReviewDTO>(_reviewRepository.GetReview(reviewId));
             return Ok(updated);
         }
+
+
+                [HttpDelete("{reviewId:int}")]
+                [ProducesResponseType(200)]
+                [ProducesResponseType(400)]
+                [ProducesResponseType(404)]
+                [ProducesResponseType(500)]
+                public IActionResult DeleteReview(int reviewId)
+                {
+                    if (!_reviewRepository.ReviewExists(reviewId))
+                        return NotFound();
+
+                    var reviewToDelete = _reviewRepository.GetReview(reviewId);
+                    if (reviewToDelete == null)
+                        return NotFound();
+
+                    if (!ModelState.IsValid)
+                        return BadRequest(ModelState);
+
+                    if (!_reviewRepository.DeleteReview(reviewToDelete))
+                    {
+                        ModelState.AddModelError("", "Something went wrong while deleting review");
+                        return StatusCode(500, ModelState);
+                    }
+
+                    return Ok("Successfully deleted!");
+                }
+
     }
 }

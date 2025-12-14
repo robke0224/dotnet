@@ -19,7 +19,6 @@ namespace dotnet.Repository
             _mapper = mapper;
         }
 
-        
         public bool CreateReview(string reviewerFirstName, string reviewerLastName, Review review)
         {
             if (review == null) return false;
@@ -54,7 +53,6 @@ namespace dotnet.Repository
             return Save();
         }
 
-    
         public bool CreateReview(Review review)
         {
             if (review == null) return false;
@@ -63,7 +61,6 @@ namespace dotnet.Repository
             return Save();
         }
 
-   
         public bool UpdateReview(Review review)
         {
             if (review == null) return false;
@@ -84,6 +81,18 @@ namespace dotnet.Repository
             if (review.Reviewer != null)
                 existing.Reviewer = review.Reviewer;
 
+            return Save();
+        }
+
+        
+        public bool DeleteReview(Review review)
+        {
+            if (review == null) return false;
+
+            var existing = _context.Reviews.FirstOrDefault(r => r.Id == review.Id);
+            if (existing == null) return false;
+
+            _context.Reviews.Remove(existing);
             return Save();
         }
 
