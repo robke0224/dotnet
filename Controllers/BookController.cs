@@ -348,5 +348,34 @@ namespace dotnet.Controllers
             var updated = _mapper.Map<BookDTO>(_bookRepository.GetBook(bookId));
             return Ok(updated);
         }
+
+            [HttpDelete("{bookId:int}")]
+            [ProducesResponseType(200)]
+            [ProducesResponseType(400)]
+            [ProducesResponseType(404)]
+            [ProducesResponseType(500)]
+            public IActionResult DeleteBook(int bookId)
+            {
+                if (!_bookRepository.BookExists(bookId))
+                    return NotFound();
+
+                var bookToDelete = _bookRepository.GetBook(bookId);
+                if (bookToDelete == null)
+                    return NotFound();
+
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                if (!_bookRepository.DeleteBook(bookToDelete))
+                {
+                    ModelState.AddModelError("", "Something went wrong while deleting book");
+                    return StatusCode(500, ModelState);
+                }
+
+                return Ok("Successfully deleted!");
+            }
+
     }
+
+    
 }

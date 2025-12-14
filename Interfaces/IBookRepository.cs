@@ -11,6 +11,7 @@ namespace dotnet.Interfaces
         bool BookExists(int bookId);
         bool CreateBook(int authorId, int genreId, Book book);
         bool UpdateBook(int bookId, int authorId, int genreId, Book book);
+        bool DeleteBook(Book book);
         bool Save();
     }
 }

@@ -31,19 +31,25 @@ namespace dotnet.Repository
                     .ThenInclude(ba => ba.Author)
                 .Include(b => b.BookGenres)
                     .ThenInclude(bg => bg.Genre)
-                .Where(b => b.Id == bookId)
-                .FirstOrDefault();
+                .Include(b => b.Reviews)
+                .FirstOrDefault(b => b.Id == bookId);
         }
 
+      
         public Book GetBook(string bookTitle)
         {
+            if (string.IsNullOrWhiteSpace(bookTitle))
+                return null;
+
+            var title = bookTitle.Trim().ToUpper();
+
             return _context.Books
                 .Include(b => b.BookAuthors)
                     .ThenInclude(ba => ba.Author)
                 .Include(b => b.BookGenres)
                     .ThenInclude(bg => bg.Genre)
-                .Where(b => b.BookTitle == bookTitle)
-                .FirstOrDefault();
+                .Include(b => b.Reviews)
+                .FirstOrDefault(b => b.BookTitle != null && b.BookTitle.Trim().ToUpper() == title);
         }
 
         public ICollection<Book> GetBooks()
@@ -53,6 +59,7 @@ namespace dotnet.Repository
                     .ThenInclude(ba => ba.Author)
                 .Include(b => b.BookGenres)
                     .ThenInclude(bg => bg.Genre)
+                .Include(b => b.Reviews)
                 .OrderBy(b => b.BookTitle)
                 .ToList();
         }
@@ -77,7 +84,6 @@ namespace dotnet.Repository
             return _context.SaveChanges() > 0;
         }
 
-        
         public bool UpdateBook(int bookId, int authorId, int genreId, Book book)
         {
             var existing = _context.Books
@@ -92,11 +98,9 @@ namespace dotnet.Repository
 
             if (author == null || genre == null || book == null) return false;
 
-            
             existing.BookTitle = book.BookTitle;
             existing.BookPublicationDate = book.BookPublicationDate;
 
-            
             if (existing.BookAuthors != null && existing.BookAuthors.Any())
                 _context.BookAuthors.RemoveRange(existing.BookAuthors);
 
@@ -107,6 +111,32 @@ namespace dotnet.Repository
             _context.BookGenres.Add(new BookGenre { Book = existing, Genre = genre });
 
             return _context.SaveChanges() > 0;
+        }
+
+        
+        public bool DeleteBook(Book book)
+        {
+            if (book == null) return false;
+
+            var existing = _context.Books
+                .Include(b => b.BookAuthors)
+                .Include(b => b.BookGenres)
+                .Include(b => b.Reviews)
+                .FirstOrDefault(b => b.Id == book.Id);
+
+            if (existing == null) return false;
+
+            if (existing.Reviews != null && existing.Reviews.Any())
+                _context.Reviews.RemoveRange(existing.Reviews);
+
+            if (existing.BookAuthors != null && existing.BookAuthors.Any())
+                _context.BookAuthors.RemoveRange(existing.BookAuthors);
+
+            if (existing.BookGenres != null && existing.BookGenres.Any())
+                _context.BookGenres.RemoveRange(existing.BookGenres);
+
+            _context.Books.Remove(existing);
+            return Save();
         }
 
         public bool Save()
