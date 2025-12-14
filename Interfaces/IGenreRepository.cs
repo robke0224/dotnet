@@ -10,6 +10,7 @@ namespace dotnet.Interfaces
         bool GenreExists(int genreId);
         bool CreateGenre(Genre genre);
         bool UpdateGenre(Genre genre);
+        bool DeleteGenre(Genre genre);
         bool Save();
     }
 }

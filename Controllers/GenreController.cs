@@ -144,5 +144,34 @@ namespace dotnet.Controllers
             var updated = _mapper.Map<GenreDTO>(_genreRepository.GetGenre(genreId));
             return Ok(updated);
         }
+            [HttpDelete("{genreId:int}")]
+            [ProducesResponseType(200)]
+            [ProducesResponseType(400)]
+            [ProducesResponseType(404)]
+            [ProducesResponseType(500)]
+            public IActionResult DeleteGenre(int genreId)
+            {
+                if (!_genreRepository.GenreExists(genreId))
+                    return NotFound();
+
+                var genreToDelete = _genreRepository.GetGenre(genreId);
+                if (genreToDelete == null)
+                    return NotFound();
+
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                if (!_genreRepository.DeleteGenre(genreToDelete))
+                {
+                    ModelState.AddModelError("", "Something went wrong while deleting genre");
+                    return StatusCode(500, ModelState);
+                }
+
+                return Ok("Successfully deleted!");
+            }
+
+
+
     }
+
 }

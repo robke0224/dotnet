@@ -45,17 +45,32 @@ namespace dotnet.Repository
             return Save();
         }
 
-       
         public bool UpdateGenre(Genre genre)
         {
+            if (genre == null) return false;
+
             var existing = _context.Genres.FirstOrDefault(g => g.Id == genre.Id);
             if (existing == null) return false;
 
             existing.GenreName = genre.GenreName;
-
             return Save();
         }
 
+        
+        public bool DeleteGenre(Genre genre)
+        {
+            if (genre == null) return false;
+
+            var existing = _context.Genres.FirstOrDefault(g => g.Id == genre.Id);
+            if (existing == null) return false;
+
+            var bookGenres = _context.BookGenres.Where(bg => bg.GenreId == existing.Id).ToList();
+            if (bookGenres.Any())
+                _context.BookGenres.RemoveRange(bookGenres);
+
+            _context.Genres.Remove(existing);
+            return Save();
+        }
 
         public bool Save()
         {
