@@ -126,7 +126,6 @@ namespace dotnet.Controllers
             var first = reviewerUpdate.FirstName.Trim();
             var last = reviewerUpdate.LastName.Trim();
 
-        
             var duplicate = _reviewerRepository.GetReviewers()
                 .Any(r => r.Id != reviewerId &&
                           r.FirstName.Trim().ToUpper() == first.ToUpper() &&
@@ -156,6 +155,39 @@ namespace dotnet.Controllers
 
             var updated = _mapper.Map<ReviewerDTO>(_reviewerRepository.GetReviewer(reviewerId));
             return Ok(updated);
+        }
+
+        
+        [HttpDelete("{reviewerId:int}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteReviewer(int reviewerId)
+        {
+            if (!_reviewerRepository.ReviewerExists(reviewerId))
+                return NotFound();
+
+          
+            var hasReviews = _reviewerRepository.GetReviewsByReviewer(reviewerId).Any();
+            if (hasReviews)
+                return Conflict("Cannot delete reviewer because they have reviews. Delete reviews first.");
+
+            var reviewerToDelete = _reviewerRepository.GetReviewer(reviewerId);
+            if (reviewerToDelete == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.DeleteReviewer(reviewerToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong while deleting reviewer");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully deleted!");
         }
     }
 }

@@ -26,7 +26,7 @@ namespace dotnet.Repository
 
         public Reviewer GetReviewer(int reviewerId)
         {
-            // ✅ FIX: neinclude'inam rv.Reviewer (EF fix-up padaro pats)
+           
             return _context.Reviewers
                 .Include(r => r.Reviews)
                     .ThenInclude(rv => rv.Book)
@@ -53,7 +53,6 @@ namespace dotnet.Repository
             return Save();
         }
 
-
         public bool UpdateReviewer(Reviewer reviewer)
         {
             if (reviewer == null) return false;
@@ -64,6 +63,18 @@ namespace dotnet.Repository
             existing.FirstName = reviewer.FirstName;
             existing.LastName = reviewer.LastName;
 
+            return Save();
+        }
+
+        
+        public bool DeleteReviewer(Reviewer reviewer)
+        {
+            if (reviewer == null) return false;
+
+            var existing = _context.Reviewers.FirstOrDefault(r => r.Id == reviewer.Id);
+            if (existing == null) return false;
+
+            _context.Reviewers.Remove(existing);
             return Save();
         }
 
