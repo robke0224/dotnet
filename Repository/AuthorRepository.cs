@@ -1,11 +1,12 @@
+using dotnet.Data;
+using dotnet.Interfaces;
+using dotnet.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace dotnet.Repository
 {
-    using dotnet.Data;
-    using dotnet.Interfaces;
-    using dotnet.Models;
-    using System.Collections.Generic;
-    using System.Linq;
-
     public class AuthorRepository : IAuthorRepository
     {
         private readonly DataContext _context;
@@ -62,6 +63,24 @@ namespace dotnet.Repository
             existing.FirstName = author.FirstName;
             existing.LastName = author.LastName;
 
+            return Save();
+        }
+
+        
+        public bool DeleteAuthor(Author author)
+        {
+            if (author == null) return false;
+
+            var existing = _context.Authors
+                .Include(a => a.BookAuthors)
+                .FirstOrDefault(a => a.Id == author.Id);
+
+            if (existing == null) return false;
+
+            if (existing.BookAuthors != null && existing.BookAuthors.Any())
+                _context.BookAuthors.RemoveRange(existing.BookAuthors);
+
+            _context.Authors.Remove(existing);
             return Save();
         }
 

@@ -154,5 +154,34 @@ namespace dotnet.Controllers
             var updated = _mapper.Map<AuthorDTO>(_authorRepository.GetAuthor(authorId));
             return Ok(updated);
         }
+
+            [HttpDelete("{authorId:int}")]
+            [ProducesResponseType(200)]
+            [ProducesResponseType(400)]
+            [ProducesResponseType(404)]
+            [ProducesResponseType(500)]
+            public IActionResult DeleteAuthor(int authorId)
+            {
+                if (!_authorRepository.AuthorExists(authorId))
+                    return NotFound();
+
+                var authorToDelete = _authorRepository.GetAuthor(authorId);
+                if (authorToDelete == null)
+                    return NotFound();
+
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                if (!_authorRepository.DeleteAuthor(authorToDelete))
+                {
+                    ModelState.AddModelError("", "Something went wrong while deleting");
+                    return StatusCode(500, ModelState);
+                }
+
+                return Ok("Successfully deleted!");
+            }
+
     }
+
+        
 }
